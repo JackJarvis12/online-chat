@@ -1,0 +1,66 @@
+<html>
+<head>
+	<title>Chat</title>
+	<style>
+		#chat{
+			height: 400px;
+			width: 350px;
+			overflow-y: auto;
+			border-width: 1px;
+			border-color: gray;
+			border-style: solid;
+			position: relative;
+			top: 5;
+		}
+		#send-message{
+			position: relative;
+			top: 10;
+		}
+	</style>
+</head>
+<body>
+	<h1>Chat</h1>
+	<p>Name:</p>
+	<input id="name", placeholder="Type your name..." autocomplete="off"></input>
+	<div id="chat"></div>
+	<form id="send-message">
+		<input size="35" id="message" placeholder="Type your message..." autocomplete="off"></input>
+		<input type="submit" value="Send"></input>
+	</form>
+	<p>Made by Jack Jarvis</p>
+	<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		jQuery(function($){
+			var socket = io.connect();
+			var $messageForm = $('#send-message')
+			var $messageBox = $('#message')
+			var $chat = $('#chat')
+			var $name = $('#name')
+			
+			$messageForm.submit(function(e){
+				e.preventDefault();
+				if (document.getElementById("name").value == "") {
+					alert("Please type in your name")
+				} else if (document.getElementById("message").value == "") {
+					alert("Please type a message")
+				} else {
+					message = {
+						"name": document.getElementById("name").value,
+						"msg": document.getElementById("message").value
+						}
+					socket.emit('send message', message)
+					$messageBox.val('')
+				}
+			});
+			
+			socket.on('new message', function(data){
+				$chat.append(data + "<br/>")
+				var objDiv = document.getElementById("chat");
+				objDiv.scrollTop = objDiv.scrollHeight;
+				
+			});
+		});
+	</script>
+</body>
+</html>
